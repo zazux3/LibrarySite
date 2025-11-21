@@ -1,43 +1,70 @@
+const asyncHandler = require('express-async-handler');
+const Book = require('../models/bookModel');
+
 //@desc Get all books
 //@route GET /api/books
 //@access Public
-const getBooks = (req, res) => {
-    res.status(200).json({message: "Get List of books"});
-};
+const getBooks = asyncHandler (async (req, res) => {
+    const books = await Book.find();
+    res.status(200).json({books});
+});
 
 //@desc Create New book
 //@route POST /api/books
 //@access Public
-const createBook = (req, res) => {
+const createBook = asyncHandler(async (req, res) => {
     console.log("The request body is:", req.body);
-    const { title, author, isbn } = req.body;
-    if (!title || !author || !isbn) {
-        return res.status(400).json({message: "Please include all fields"});
-    }   
-    res.status(201).json({message: "Add New Book"});
-};
+    const { title, author, publishedYear, genre, description } = req.body;
+    if (!title || !author || !publishedYear || !genre || !description) {
+        return res.status(400).json({ message: "Please include all fields" });
+    }
+    const book = await Book.create({
+        title,
+        author,
+        publishedYear,
+        genre,
+        description
+    });
+    res.status(201).json({ book });
+});
+
 
 //@desc Get book
 //@route GET /api/books/:id
 //@access Public
-const getBook = (req, res) => {
-    res.status(200).json({message: `Get book for ${req.params.id}`});
-};
+const getBook = asyncHandler (async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+    }   
+    res.status(200).json(book);
+});
 
 //@desc Update book
 //@route PUT /api/books/:id
 //@access Public
-const updateBook = (req, res) => {
-    res.status(200).json({message: `Update book for ${req.params.id}`});
-};
+const updateBook = asyncHandler (async (req, res) => {
+        const book = await Book.findById(req.params.id);
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+        
+        const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedBook);
+    //  
+    res.status(200).json(updatedBook);
+});
 
 //@desc Delete book
 //@route DELETE /api/books/:id
 //@access Public
-const deleteBook = (req, res) => {
-    res.status(200).json({message: `Delete book for ${req.params.id}`});
-};  
-
+const deleteBook = asyncHandler(async (req, res) => {
+  const book = await Book.findByIdAndDelete(req.params.id);
+  if (!book) {
+    return res.status(404).json({ message: "Book not found" });
+  }
+  res.status(200).json(book);
+});
 
 
 module.exports = {
