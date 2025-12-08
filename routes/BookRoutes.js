@@ -6,7 +6,9 @@ const {
     getBook,
     updateBook,
     deleteBook } = require('../controllers/bookController');
+const validateTokenHandler = require('../middleware/validateTokenHandler');
 
+router.use(validateTokenHandler);
 router.route("/").get(getBooks).post(createBook);
 router.route("/:id").get(getBook).put(updateBook).delete(deleteBook);
 

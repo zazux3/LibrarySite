@@ -3,15 +3,15 @@ const Book = require('../models/bookModel');
 
 //@desc Get all books
 //@route GET /api/books
-//@access Public
+//@access private
 const getBooks = asyncHandler (async (req, res) => {
-    const books = await Book.find();
+    const books = await Book.find(user_id=req.user.id);
     res.status(200).json({books});
 });
 
 //@desc Create New book
 //@route POST /api/books
-//@access Public
+//@access private
 const createBook = asyncHandler(async (req, res) => {
     console.log("The request body is:", req.body);
     const { title, author, publishedYear, genre, description } = req.body;
@@ -23,7 +23,8 @@ const createBook = asyncHandler(async (req, res) => {
         author,
         publishedYear,
         genre,
-        description
+        description,
+        user_id: req.user.id
     });
     res.status(201).json({ book });
 });
@@ -31,7 +32,7 @@ const createBook = asyncHandler(async (req, res) => {
 
 //@desc Get book
 //@route GET /api/books/:id
-//@access Public
+//@access private
 const getBook = asyncHandler (async (req, res) => {
     const book = await Book.findById(req.params.id);
     if (!book) {
@@ -42,7 +43,7 @@ const getBook = asyncHandler (async (req, res) => {
 
 //@desc Update book
 //@route PUT /api/books/:id
-//@access Public
+//@access private
 const updateBook = asyncHandler (async (req, res) => {
         const book = await Book.findById(req.params.id);
         if (!book) {
@@ -54,10 +55,9 @@ const updateBook = asyncHandler (async (req, res) => {
     //  
     res.status(200).json(updatedBook);
 });
-
 //@desc Delete book
 //@route DELETE /api/books/:id
-//@access Public
+//@access private
 const deleteBook = asyncHandler(async (req, res) => {
   const book = await Book.findByIdAndDelete(req.params.id);
   if (!book) {

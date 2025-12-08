@@ -2,6 +2,8 @@ const express = require('express');
 const errorHandler = require('./middleware/errorHandler');
 const connectDB = require('./config/dbConnection');
 require('dotenv').config();
+const { validateTokenHandler } = require('./middleware/validateTokenHandler');
+
 
 connectDB();
 const app = express();
@@ -20,8 +22,6 @@ app.listen(PORT, () => {
 });
 
 const path = require("path");
-// serve client build
-app.use(express.static(path.join(__dirname, "client", "dist")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
-});
+const { rawListeners } = require('process');
+
+

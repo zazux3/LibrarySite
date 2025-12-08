@@ -42,33 +42,39 @@ const registerUser = asyncHandler(async (req, res) => {
 // @access Public
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+
     if (!email || !password) {
         res.status(400);
         throw new Error('Please fill in all fields');
-        }
-         const user = await User.findOne({ email });
-         // Check user and password match
-        if (user && (await bcrypt.compare(password, user.password))) {
-            res.status(200).json({token});
-            const token = jwt.sign({ 
-                user:{
-                username: user.name,
-                email: user.email,
-                id: user._id
-            }
-        }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+        const token = jwt.sign(
+            {
+                user: {
+                    username: user.name,
+                    email: user.email,
+                    id: user._id
+                }
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m' }
+        );
+
         res.status(200).json({ token });
-        } else {
-            res.status(401);
-            throw new Error('Invalid email or password');
-        }   
+    } else {
+        res.status(401);
+        throw new Error('Invalid email or password');
+    }
 });
 
 // @desc User profile
 // @route GET /api/users/profile
 // @access Private
 const getUserProfile = asyncHandler(async (req, res) => {
-  res.json({ message: 'Get user profile' });
+  res.json({message: 'User profile accessed', user: req.user });
 });
 
 module.exports = {
