@@ -25,6 +25,15 @@ const bookSchema = mongoose.Schema({
     description: {
         type: String,
         required: [true, 'Please add a description']
+    },
+    borrowedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
+    borrowedAt: {
+      type: Date,
+      default: null
     }
 }, {
     timestamps: true

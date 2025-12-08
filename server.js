@@ -11,8 +11,9 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 app.use(express.json());
-app.use("/api/books", require("./routes/BookRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/books", require("./routes/BookRoutes"));
+
 
 app.use(errorHandler);
     

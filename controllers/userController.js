@@ -1,84 +1,46 @@
-const asyncHandler = require('express-async-handler');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
+const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
 
-// @desc Register a user
-// @route POST /api/users/register
-// @access Public
+// Register
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ message: "Please fill all fields" });
 
-    if (!name || !email || !password) {
-        res.status(400);
-        throw new Error('Please fill in all fields');
-    }
     const userExists = await User.findOne({ email });
-    if (userExists) {
-        res.status(400);
-        throw new Error('User already exists');
-    }
+    if (userExists) return res.status(400).json({ message: "Email already exists" });
 
-    //Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({
-        name,
-        email,
-        password: hashedPassword
+    const user = await User.create({ name, email, password: hashedPassword, role: role || "user" });
+
+    res.status(201).json({
+        message: "User registered",
+        user: { id: user._id, name: user.name, email: user.email, role: user.role }
     });
-    if (user) {
-        res.status(201).json({
-            _id: user.id,
-            name: user.name,
-            email: user.email
-        });
-    } else {
-        res.status(400);
-       throw new Error('Invalid user data');
-    }
 });
-// @desc Login a user
-// @route POST /api/users/login
-// @access Public
+
+// Login
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-        res.status(400);
-        throw new Error('Please fill in all fields');
-    }
+    if (!email || !password) return res.status(400).json({ message: "Please add email and password" });
 
     const user = await User.findOne({ email });
-
     if (user && (await bcrypt.compare(password, user.password))) {
         const token = jwt.sign(
-            {
-                user: {
-                    username: user.name,
-                    email: user.email,
-                    id: user._id
-                }
-            },
+            { id: user._id, name: user.name, email: user.email, role: user.role },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15m' }
+            { expiresIn: "1d" }
         );
-
-        res.status(200).json({ token });
-    } else {
-        res.status(401);
-        throw new Error('Invalid email or password');
+        return res.status(200).json({ message: "Login successful", token });
     }
+
+    res.status(401).json({ message: "Invalid email or password" });
 });
 
-// @desc User profile
-// @route GET /api/users/profile
-// @access Private
+// Profile
 const getUserProfile = asyncHandler(async (req, res) => {
-  res.json({message: 'User profile accessed', user: req.user });
+    res.status(200).json({ id: req.user.id, name: req.user.name, email: req.user.email, role: req.user.role });
 });
 
-module.exports = {
-  registerUser,
-  loginUser,
-  getUserProfile,
-};
+module.exports = { registerUser, loginUser, getUserProfile };
