@@ -1,28 +1,25 @@
-const express = require('express');
-const errorHandler = require('./middleware/errorHandler');
-const connectDB = require('./config/dbConnection');
-require('dotenv').config();
-const { validateTokenHandler } = require('./middleware/validateTokenHandler');
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const connectDB = require("./config/dbConnection");
 
+dotenv.config();
+connectDB(); // connect to MongoDB
 
-connectDB();
-const app = express();
+const app = express(); // ⚡ must be before app.use()
 
-const PORT = process.env.PORT || 5001;
-
+app.use(cors());
 app.use(express.json());
+
+// Routes
 app.use("/api/users", require("./routes/userRoutes"));
-app.use("/api/books", require("./routes/BookRoutes"));
+app.use("/api/books", require("./routes/bookRoutes"));
 
-
-app.use(errorHandler);
-    
-
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/`);
+// Error handling middleware (optional but recommended)
+app.use((err, req, res, next) => {
+  const status = res.statusCode !== 200 ? res.statusCode : 500;
+  res.status(status).json({ message: err.message });
 });
 
-const path = require("path");
-const { rawListeners } = require('process');
-
-
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
