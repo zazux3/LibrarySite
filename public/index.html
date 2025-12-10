@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Library - Book Management</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>My Library</h1>
+        <p id="user-greeting"></p>
+        <button onclick="logout()" id="logout-btn" style="display: none">
+          Logout
+        </button>
+      </header>
+
+      <div id="login-form" class="card">
+        <h2>Login / Register</h2>
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <input type="text" id="name" placeholder="Name (for register)" />
+        <button onclick="login()">Login</button>
+        <button onclick="register()">Register</button>
+      </div>
+
+      <div id="app" style="display: none">
+        <div class="card">
+          <h2>Add New Book</h2>
+          <input id="title" placeholder="Title" />
+          <input id="author" placeholder="Author" />
+          <input id="year" type="number" placeholder="Year" />
+          <input id="genre" placeholder="Genre" />
+          <textarea id="desc" placeholder="Description"></textarea>
+          <button onclick="addBook()">Add Book</button>
+        </div>
+
+        <h2>All Books</h2>
+        <div id="books-list"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
